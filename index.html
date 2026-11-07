@@ -4,253 +4,1140 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Установка и настройка XRay Core</title>
-  
+
   <style>
-    /* --- НАЧАЛО БЛОКА: Определение глобальных CSS-переменных (Custom Properties) --- */
-    /* Этот блок позволяет легко изменять основные параметры стиля (цвета, размеры) в одном месте. */
+    /* --- СВЕТЛАЯ СЕРАЯ ПАЛИТРА В СТИЛЕ APPLE (iOS / macOS Light Mode) --- */
     :root {
-      --main-blue: #2c72c7;          /* Определяет основную переменную для синего цвета (для заголовков, ссылок). */
-      --light-blue: #e6f0fb;         /* Определяет переменную для светло-голубого цвета (для фона блоков). */
-      --bg-color: #ffffff;           /* Определяет переменную для цвета фона всей страницы (белый). */
-      --text-color: #333333;         /* Определяет переменную для основного цвета текста (темно-серый). */
-      --code-bg: #f5f5f5;             /* Определяет переменную для фона блоков с кодом (светло-серый). */
-      --border-radius: 8px;          /* Определяет переменную для радиуса скругления углов у блоков. */
-      --page-width: 500px;           /* Определяет переменную для максимальной ширины контента на странице. */
+      --bg-page: #dcdce2;              /* Контрастный платиново-серый фон страницы */
+      --card-bg: #ffffff;              /* Чистый белый фон парящих карточек */
+      --surface-gray: #f2f2f7;         /* Светло-серый фон внутренних элементов */
+      --surface-border: #d1d1d6;       /* Четкая рамка для блоков кода и полей */
+      --text-main: #1d1d1f;            /* Основной графитовый цвет текста */
+      --text-secondary: #6e6e73;       /* Вторичный серый текст подписей */
+      --btn-bg: #e5e5ea;               /* Спокойный серый фон кнопок */
+      --btn-hover: #d1d1d6;            /* Наведение на кнопку */
+      --btn-text: #1d1d1f;             /* Текст на кнопке */
+      --btn-copied-bg: #34c759;        /* Зеленый акцент при копировании */
+      --btn-copied-text: #ffffff;
+      --highlight-param: #0066cc;      /* Подсветка динамически подставляемых параметров */
+      --radius-card: 16px;             /* Скругление карточек */
+      --radius-inner: 12px;            /* Скругление блоков кода и полей ввода */
+      --radius-btn: 8px;               /* Скругление кнопок */
+      --page-width: 660px;             /* Максимальная ширина контейнера */
     }
-    /* --- КОНЕЦ БЛОКА: Определение глобальных CSS-переменных --- */
 
+    * {
+      box-sizing: border-box;
+    }
 
-    /* --- НАЧАЛО БЛОКА: Базовые стили для всей страницы (body) --- */
-    /* Здесь задаются основные параметры для всего документа. */
     body {
-      font-family: "Segoe UI", sans-serif; /* Устанавливает основной шрифт для текста с запасным вариантом. */
-      background-color: var(--bg-color);   /* Задает цвет фона страницы, используя переменную. */
-      color: var(--text-color);            /* Задает основной цвет текста, используя переменную. */
-      line-height: 1.6;                    /* Устанавливает межстрочный интервал для лучшей читаемости. */
-      padding: 20px;                       /* Добавляет внутренний отступ со всех сторон тега <body>. */
-      margin: 0;                           /* Убирает внешний отступ по умолчанию у тега <body>. */
-    } до
-    /* --- КОНЕЦ БЛОКА: Базовые стили для всей страницы (body) --- */
-
-
-    /* --- НАЧАЛО БЛОКА: Стили для основного контейнера-обертки --- */
-    /* Этот класс ограничивает ширину контента и центрирует его. */
-    .container {
-      max-width: var(--page-width);      /* Устанавливает максимальную ширину контента, используя переменную. */
-      margin: auto;                      /* Автоматически вычисляет боковые отступы для центрирования блока. */
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.55;
+      padding: 24px 16px 40px;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
     }
-    /* --- КОНЕЦ БЛОКА: Стили для основного контейнера-обертки --- */
 
+    .container {
+      max-width: var(--page-width);
+      margin: 0 auto;
+    }
 
-    /* --- НАЧАЛО БЛОКА: Стили для заголовков --- */
-    /* Общие и индивидуальные стили для заголовков h1, h2, h3. */
-    h1, h2, h3 {
-      color: var(--main-blue);           /* Задает всем заголовкам синий цвет, используя переменную. */
+    /* --- ШАПКА СТРАНИЦЫ --- */
+    .page-header {
+      margin-bottom: 20px;
+      padding: 0 4px;
     }
 
     h1 {
-      font-size: 2em;                    /* Устанавливает размер шрифта для заголовка первого уровня (в 2 раза больше базового). */
-      margin-top: 0;                     /* Убирает верхний отступ у главного заголовка страницы. */
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin: 0 0 4px 0;
+    }
+
+    .subtitle {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* --- КАРТОЧКИ РАЗДЕЛОВ --- */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      padding: 22px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.11), 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
     }
 
     h2 {
-      border-bottom: 2px solid var(--light-blue); /* Добавляет светло-голубую линию под заголовком второго уровня. */
-      padding-bottom: 5px;               /* Добавляет небольшой отступ снизу, между текстом заголовка и линией. */
-    }
-    /* --- КОНЕЦ БЛОКА: Стили для заголовков --- */
-
-
-    /* --- НАЧАЛО БЛОКА: Стили для оберток команд и интерактивных элементов --- */
-    /* Эти стили применяются к блокам, содержащим команды и чекбоксы. */
-    .checkbox-item, .command-wrapper {
-      background: var(--light-blue);     /* Задает светло-голубой фон, используя переменную. */
-      padding: 10px;                     /* Добавляет внутренние отступы со всех сторон. */
-      border-radius: var(--border-radius); /* Скругляет углы блока, используя переменную. */
-      margin: 10px 0;                    /* Добавляет внешние отступы сверху и снизу. */
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    label {
-      font-weight: bold;                 /* Делает текст меток (подписей) жирным. */
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 26px;
+      padding: 0 8px;
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
     }
-    /* --- КОНЕЦ БЛОКА: Стили для оберток команд и интерактивных элементов --- */
 
+    p {
+      margin: 8px 0;
+      font-size: 0.92rem;
+      color: #3a3a3c;
+    }
 
-    /* --- НАЧАЛО БЛОКА: Стили для иконки информации и всплывающей подсказки (Tooltip) --- */
-    /* Описывает внешний вид и поведение интерактивной иконки с подсказкой. */
+    .section-note {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin: 14px 0 6px 0;
+    }
+
+    /* --- ИНТЕРАКТИВНЫЙ МОДУЛЬ ВВОДА ПАРАМЕТРОВ --- */
+    .params-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: flex-end;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-height: 2.3em;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 9px 11px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      text-align: center;
+      color: var(--text-main);
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .input-group input:focus {
+      background: #ffffff;
+      border-color: #8e8e93;
+    }
+
+    /* --- ПАРЯЩИЕ СВЕТЛЫЕ БЛОКИ КОДА И ОЖИДАЕМОГО РЕЗУЛЬТАТА --- */
+    .code-block {
+      background-color: #ffffff;
+      border: 1px solid #c7c7cc;
+      padding: 12px 48px 12px 14px;
+      border-radius: var(--radius-inner);
+      position: relative;
+      margin: 10px 0 12px 0;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .output-preview {
+      background-color: #f5f5f7;
+      border: 1px dashed #c7c7cc;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin: 6px 0 14px 0;
+    }
+
+    .output-preview-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .output-preview pre {
+      color: #3a3a3c;
+      font-size: 0.79rem;
+      line-height: 1.4;
+    }
+
+    /* --- МАТРИЦА СРАВНЕНИЯ ВЕРДИКТОВ --- */
+    .matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 10px;
+      font-size: 0.81rem;
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .matrix-table th {
+      background: var(--surface-gray);
+      padding: 9px 12px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .matrix-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--surface-border);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .port-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .port-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+
+    /* --- ИНТЕРАКТИВНЫЙ СЕЛЕКТОР РЕЗУЛЬТАТОВ И АККОРДЕОН --- */
+    .result-selector {
+      background: #ffffff;
+      border: 1px solid #c7c7cc;
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin: 8px 0 16px 0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07), 0 2px 5px rgba(0, 0, 0, 0.04);
+    }
+
+    .selector-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .selector-row {
+      display: grid;
+      grid-template-columns: 145px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    .selector-row:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .selector-port-label {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .selector-select {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      padding: 8px 11px;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      color: var(--text-main);
+      background: var(--surface-gray);
+      border: 1.5px solid var(--surface-border);
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.18s ease;
+    }
+
+    /* Бледное состояние по умолчанию (пока пользователь не выбрал свой вариант) */
+    .selector-select.state-unselected {
+      opacity: 0.52;
+      color: #8e8e93;
+      background: #f8f8fa;
+      border: 1.5px dashed #aeaeb2;
+      font-weight: 400;
+    }
+
+    /* Яркие активные состояния после выбора пользователем */
+    .selector-select.state-open {
+      opacity: 1;
+      background: #eefbf1;
+      border: 1.5px solid #28cd41;
+      color: #0b3d14;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(40, 205, 65, 0.18);
+    }
+
+    .selector-select.state-timeout {
+      opacity: 1;
+      background: #fff0ef;
+      border: 1.5px solid #ff3b30;
+      color: #690b05;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.18);
+    }
+
+    .selector-select.state-closed {
+      opacity: 1;
+      background: #f2f2f7;
+      border: 1.5px solid #636366;
+      color: #1d1d1f;
+      font-weight: 600;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .verdict-box {
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      border: 1px solid #d2d2d7;
+      background: #ffffff;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .verdict-box.verdict-green {
+      background: #f2faf4;
+      border-color: #34c759;
+    }
+
+    .verdict-box.verdict-yellow {
+      background: #fffdf2;
+      border-color: #ffcc00;
+    }
+
+    .verdict-box.verdict-red {
+      background: #fff5f5;
+      border-color: #ff3b30;
+    }
+
+    .verdict-box.verdict-gray {
+      background: var(--surface-gray);
+      border-color: #c7c7cc;
+    }
+
+    .verdict-header {
+      font-size: 0.96rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .verdict-desc {
+      font-size: 0.88rem;
+      color: #3a3a3c;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    details.matrix-accordion {
+      margin: 12px 0 16px 0;
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    details.matrix-accordion summary {
+      padding: 11px 14px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    details.matrix-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.matrix-accordion summary::after {
+      content: "Развернуть ▾";
+      font-size: 0.76rem;
+      color: var(--highlight-param);
+    }
+
+    details.matrix-accordion[open] summary::after {
+      content: "Свернуть ▴";
+    }
+
+    details.matrix-accordion .accordion-body {
+      padding: 0 12px 12px 12px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    pre {
+      margin: 0;
+      font-family: "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .dyn-val {
+      color: var(--highlight-param);
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+
+    .copy-btn::before {
+      content: "⧉";
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .copy-btn.copied::before {
+      content: "✓";
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .copy-btn:hover {
+      background: var(--btn-hover);
+    }
+
+    .copy-btn.copied {
+      background: var(--btn-copied-bg);
+      color: var(--btn-copied-text);
+      border-color: transparent;
+    }
+
+    /* --- ПОДСКАЗКИ И СТАТУСЫ ДИАГНОСТИКИ --- */
     .info-icon {
-      margin-left: 8px;                  /* Добавляет небольшой отступ слева от иконки. */
-      cursor: help;                      /* Меняет курсор на знак вопроса при наведении. */
-      position: relative;                /* Устанавливает относительное позиционирование для дочерних абсолютных элементов. */
-      display: inline-block;             /* Позволяет элементу иметь блочные свойства (ширину, высоту), но оставаться в строке. */
-      font-style: normal;                /* Убирает курсивное начертание, если оно есть по умолчанию. */
-      color: #555;                       /* Задает цвет для иконки. */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: help;
+      position: relative;
     }
 
     .info-icon:hover .tooltip {
-      display: block;                    /* Показывает всплывающую подсказку (.tooltip) при наведении на родителя (.info-icon). */
+      display: block;
     }
 
     .tooltip {
-      display: none;                     /* По умолчанию всплывающая подсказка скрыта. */
-      position: absolute;                /* Позиционирует подсказку относительно родительского элемента (.info-icon). */
-      top: 120%;                         /* Располагает подсказку на 120% высоты родителя (чуть ниже). */
-      left: 0;                           /* Выравнивает подсказку по левому краю родительского элемента. */
-      background-color: #333;            /* Задает темный фон для подсказки. */
-      color: #fff;                       /* Задает белый цвет текста для подсказки. */
-      padding: 5px 10px;                 /* Добавляет внутренние отступы для текста в подсказке. */
-      border-radius: 5px;                /* Скругляет углы подсказки. */
-      font-size: 0.875em;                /* Устанавливает размер шрифта чуть меньше основного. */
-      white-space: nowrap;               /* Запрещает перенос текста на новую строку. */
-      z-index: 1;                        /* Устанавливает порядок наложения, чтобы подсказка была поверх других элементов. */
-    }
-    /* --- КОНЕЦ БЛОКА: Стили для иконки информации и всплывающей подсказки (Tooltip) --- */
-
-
-    /* --- НАЧАЛО БЛОКА: Стили для блоков с кодом --- */
-    /* Форматирование контейнеров для отображения примеров кода. */
-    .code-block {
-      background-color: var(--code-bg);  /* Задает фон для блока с кодом, используя переменную. */
-      padding: 10px 100px 10px 10px;      /* Добавляет внутренние отступы. */
-      border-radius: var(--border-radius); /* Скругляет углы, используя переменную. */
-      position: relative;                /* Устанавливает относительное позиционирование для позиционирования кнопки "Копировать". */
-      margin: 10px 0;                    /* Добавляет внешние отступы сверху и снизу. */
+      display: none;
+      position: absolute;
+      bottom: 130%;
+      right: 0;
+      width: 280px;
+      background-color: #ffffff;
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--surface-border);
+      font-size: 0.8rem;
+      font-weight: 400;
+      line-height: 1.45;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      z-index: 10;
     }
 
-    /* --- ИЗМЕНЕННЫЙ БЛОК --- */
-    pre {
-      margin: 0;                         /* Убирает внешние отступы по умолчанию у тега <pre>. */
-      white-space: pre-wrap;             /* Включает перенос строк, чтобы код не выходил за пределы блока по ширине. */
-      overflow-wrap: break-word;         /* Переносит очень длинные слова или строки (например, URL), которые не помещаются в контейнер. */
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+      padding: 9px 12px;
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      font-size: 0.81rem;
+      color: var(--text-secondary);
     }
-    /* --- КОНЕЦ ИЗМЕНЕННОГО БЛОКА --- */
 
-    .copy-btn {
-      position: absolute;                /* Абсолютное позиционирование относительно родительского .code-block. */
-      top: 10px;                         /* Отступ 10px от верхнего края родителя. */
-      right: 10px;                       /* Отступ 10px от правого края родителя. */
-      padding: 5px 10px;                 /* Внутренние отступы для кнопки. */
-      font-size: 0.8em;                  /* Уменьшенный размер шрифта для текста на кнопке. */
-      background: var(--main-blue);      /* Синий фон для кнопки, используя переменную. */
-      color: white;                      /* Белый цвет текста на кнопке. */
-      border: none;                      /* Убирает рамку у кнопки. */
-      border-radius: 4px;                /* Немного скругляет углы кнопки. */
-      cursor: pointer;                   /* Меняет курсор на "указатель" при наведении. */
+    /* --- ЧЕКБОКСЫ УПРАВЛЕНИЯ ПОЛЬЗОВАТЕЛЯМИ --- */
+    .command-wrapper {
+      background: var(--surface-gray);
+      border: 1px solid var(--surface-border);
+      padding: 12px 14px;
+      border-radius: var(--radius-inner);
+      margin: 10px 0;
+      transition: opacity 0.2s ease;
     }
-    /* --- КОНЕЦ БЛОКА: Стили для блоков с кодом --- */
 
+    .command-wrapper.completed {
+      opacity: 0.55;
+    }
 
-    /* --- НАЧАЛО БЛОКА: Стили для списков и ссылок --- */
-    /* Базовое форматирование для маркированных списков и гиперссылок. */
+    .command-wrapper .code-block {
+      background: #ffffff;
+      margin-bottom: 0;
+    }
+
+    .command-wrapper label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .command-wrapper input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: #6e6e73;
+      cursor: pointer;
+    }
+
     ul {
-      padding-left: 20px;                /* Добавляет отступ слева для маркированного списка, отодвигая его от края. */
+      padding-left: 18px;
+      margin: 8px 0 0 0;
+    }
+
+    li {
+      margin-bottom: 6px;
+      font-size: 0.92rem;
     }
 
     a {
-      color: var(--main-blue);           /* Задает синий цвет для всех ссылок, используя переменную. */
+      color: var(--text-main);
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: #aeaeb2;
+      text-underline-offset: 3px;
     }
-    /* --- КОНЕЦ БЛОКА: Стили для списков и ссылок --- */
-  </style>
 
+    a:hover {
+      text-decoration-color: var(--text-main);
+    }
+
+    @media (max-width: 580px) {
+      .params-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .code-block {
+        padding: 11px 12px 44px 12px;
+      }
+      .copy-btn {
+        top: auto;
+        bottom: 8px;
+        right: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>Установка и настройка XRay Core</h1>
-
-    <h2>1. Заказ VPS-сервера</h2>
-    <p>Для начала закажите сервер у провайдера (например, ISHosting). Подходит тариф "Лайт" с локацией как можно ближе к вам (например, Финляндия). Выберите Ubuntu 22.04 x64. После оплаты вы получите доступ на почту.</p>
-
-    <h2>2. Подключение к серверу</h2>
-    <p>Подключитесь к серверу через SSH. В Windows удобно использовать <a href="https://mobaxterm.mobatek.net/" target="_blank">MobaxTerm</a>.</p>
-    <div class="code-block">
-      <pre><code>ssh root@&lt;IP_сервера&gt;</code></pre>
-      <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+    <div class="page-header">
+      <h1>Установка и настройка XRay Core</h1>
+      <p class="subtitle">Интерактивная инструкция настройки и проверки VPS</p>
     </div>
 
-    <h2>3. Смена пароля</h2>
-    <p>Сначала сгенерируйте пароль:</p>
-    <div class="code-block">
-      <pre><code>openssl rand -base64 32</code></pre>
-      <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
-    </div>
-    <p>Затем задайте его:</p>
-    <div class="code-block">
-      <pre><code>passwd</code></pre>
-      <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+    <!-- ИНТЕРАКТИВНЫЙ БЛОК ИСХОДНЫХ ДАННЫХ -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">⚙️</span> Исходные параметры сервера</h2>
+        <span class="info-icon">?
+          <span class="tooltip">Введите IP и порты вашего сервера. Все команды в инструкции ниже автоматически обновятся под ваши значения.</span>
+        </span>
+      </div>
+      <p>Заполните данные вашего VPS — они автоматически подставятся во все команды для копирования:</p>
+      <div class="params-grid">
+        <div class="input-group">
+          <label for="inp-ip">IP-адрес сервера</label>
+          <input type="text" id="inp-ip" value="185.92.182.239" placeholder="Например: 185.92.182.239" oninput="updateCommands()">
+        </div>
+        <div class="input-group">
+          <label for="inp-user">Пользователь</label>
+          <input type="text" id="inp-user" value="root" placeholder="root" oninput="updateCommands()">
+        </div>
+        <div class="input-group">
+          <label for="inp-cur-port">Текущий порт SSH</label>
+          <input type="text" id="inp-cur-port" value="22" placeholder="22" oninput="updateCommands()">
+        </div>
+        <div class="input-group">
+          <label for="inp-target-port">Новый порт SSH</label>
+          <input type="text" id="inp-target-port" value="55969" placeholder="55969" oninput="updateCommands()">
+        </div>
+        <div class="input-group">
+          <label for="inp-iface">Физ. интерфейс</label>
+          <input type="text" id="inp-iface" value="en0" placeholder="en0" oninput="updateCommands()">
+        </div>
+      </div>
     </div>
 
-    <h2>4. Установка скрипта XRay</h2>
-    <div class="code-block">
-      <pre><code>wget -qO- https://raw.githubusercontent.com/ServerTechnologies/simple-xray-core/refs/heads/main/xray-install | bash</code></pre>
-      <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+    <!-- Шаг 1 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">1</span> Заказ VPS-сервера</h2>
+      </div>
+      <p>Закажите сервер у провайдера (например, ISHosting). Подходит тариф «Лайт» с локацией как можно ближе к вам (например, Финляндия), система <strong>Ubuntu 22.04 / 24.04 x64</strong>. После оплаты впишите полученный IP в форму выше.</p>
     </div>
 
-    <h2>5. Команды для управления пользователями</h2>
-
-    <div class="command-wrapper">
-      <label><input type="checkbox"> Вывести список всех клиентов</label>
+    <!-- Шаг 2 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">2</span> Предварительная диагностика доступности и вход</h2>
+        <span class="info-icon">?
+          <span class="tooltip">Одиночный timed out на 22 порту не означает блокировку ТСПУ: если сервер уже переведен на нестандартный порт, фаервол может молча отбрасывать (DROP) пакеты на 22 порт. Оценивайте оба порта в паре.</span>
+        </span>
+      </div>
+      <p>1. Прямая проверка портов через физический интерфейс провайдера (в обход VPN):</p>
       <div class="code-block">
-        <pre><code>userlist</code></pre>
+        <pre><code id="cmd-check"></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="result-selector">
+        <div class="selector-title">🎯 Шаг А — Выберите, что вывел терминал после Команды 1:</div>
+        <div class="selector-row">
+          <span class="selector-port-label" id="lbl-c1-cur">Порт 22:</span>
+          <select id="sel-c1-cur" class="selector-select state-unselected" onchange="evaluateDiagnosis()">
+            <option value="NONE" selected>◌ Не выбрано — укажите вывод терминала для порта 22...</option>
+            <option value="OPEN">🟢 Порт 22: succeeded (прямой канал открыт)</option>
+            <option value="REFUSED">⚪ Порт 22: Connection refused (порт закрыт на сервере)</option>
+            <option value="TIMEOUT">🔴 Порт 22: Operation timed out (пакеты глушатся)</option>
+          </select>
+        </div>
+        <div class="selector-row">
+          <span class="selector-port-label" id="lbl-c1-target">Порт 55969:</span>
+          <select id="sel-c1-target" class="selector-select state-unselected" onchange="evaluateDiagnosis()">
+            <option value="NONE" selected>◌ Не выбрано — укажите вывод терминала для порта 55969...</option>
+            <option value="OPEN">🟢 Порт 55969: succeeded (прямой канал открыт)</option>
+            <option value="REFUSED">⚪ Порт 55969: Connection refused (порт закрыт на сервере)</option>
+            <option value="TIMEOUT">🔴 Порт 55969: Operation timed out (пакеты глушатся)</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="section-note">2. Санитизированная проверка ответа SSH (отсекает ложный utun, маскирует ключи):</p>
+      <div class="code-block">
+        <pre><code id="cmd-check-target"></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="result-selector">
+        <div class="selector-title">🎯 Шаг Б — Выберите, что вывел терминал после Команды 2:</div>
+        <div class="selector-row">
+          <span class="selector-port-label" id="lbl-c2-cur">Порт 22 (SSH):</span>
+          <select id="sel-c2-cur" class="selector-select state-unselected" onchange="evaluateDiagnosis()">
+            <option value="NONE" selected>◌ Не выбрано — укажите ответ SSH для порта 22...</option>
+            <option value="OPEN">🟢 Порт 22 (SSH): ssh-ed25519 / ssh-rsa ...[REDACTED]</option>
+            <option value="CLOSED">⚪ Порт 22 (SSH): нет ответа (служба не слушает порт)</option>
+          </select>
+        </div>
+        <div class="selector-row">
+          <span class="selector-port-label" id="lbl-c2-target">Порт 55969 (SSH):</span>
+          <select id="sel-c2-target" class="selector-select state-unselected" onchange="evaluateDiagnosis()">
+            <option value="NONE" selected>◌ Не выбрано — укажите ответ SSH для порта 55969...</option>
+            <option value="OPEN">🟢 Порт 55969 (SSH): ssh-ed25519 / ssh-rsa ...[REDACTED]</option>
+            <option value="CLOSED">⚪ Порт 55969 (SSH): нет ответа (служба не слушает порт)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- АВТОМАТИЧЕСКОЕ РЕЗУЛЬТИРУЮЩЕЕ ОКНО ВЕРДИКТА -->
+      <div id="verdict-container" class="verdict-box verdict-green">
+        <div class="verdict-header" id="verdict-title"></div>
+        <p class="verdict-desc" id="verdict-text"></p>
+      </div>
+
+      <!-- СПРАВОЧНАЯ МАТРИЦА В АККОРДЕОНЕ -->
+      <details class="matrix-accordion">
+        <summary>📊 Справочная матрица всех комбинаций (по эталону init-fin.sh)</summary>
+        <div class="accordion-body">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="width: 17%;">Порт</th>
+                <th style="width: 22%;">Команда 1 (Прямой en0)</th>
+                <th style="width: 22%;">Команда 2 (Через VPN)</th>
+                <th>Итоговый вердикт (логика init-fin.sh)</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-body">
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <p class="section-note">3. Подключение к серверу по SSH (в Windows удобно использовать <a href="https://mobaxterm.mobatek.net/" target="_blank" rel="noopener noreferrer">MobaxTerm</a>):</p>
+      <div class="code-block">
+        <pre><code id="cmd-ssh"></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат:</div>
+        <pre><code>Welcome to Ubuntu ... (запрос пароля и приглашение командной строки root@...)</code></pre>
+      </div>
+    </div>
+
+    <!-- Шаг 3 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">3</span> Смена пароля</h2>
+      </div>
+      <p>Сгенерируйте надежный пароль:</p>
+      <div class="code-block">
+        <pre><code>openssl rand -base64 32</code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат:</div>
+        <pre><code>K9f+m3QxL7P9v... (скопируйте выведенную строку для следующей команды)</code></pre>
+      </div>
+
+      <p>Задайте его для текущего пользователя:</p>
+      <div class="code-block">
+        <pre><code>passwd</code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат:</div>
+        <pre><code>New password:
+Retype new password:
+passwd: password updated successfully</code></pre>
+      </div>
+    </div>
+
+    <!-- Шаг 4 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">4</span> Безопасный перевод SSH на новый порт</h2>
+        <span class="info-icon">?
+          <span class="tooltip">Команда отключает ssh.socket (для Ubuntu 22.10/24+), открывает выбранный порт в UFW/iptables, делает бэкап sshd_config и проверяет синтаксис через sshd -t перед перезапуском.</span>
+        </span>
+      </div>
+      <p>Выполните на сервере команду для безопасного перевода SSH со стандартного порта на ваш целевой порт (защита от блокировки порта 22 со стороны ТСПУ):</p>
+      <div class="code-block">
+        <pre><code id="cmd-hardening"></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат:</div>
+        <pre><code id="out-hardening">SSH переведен на порт 55969</code></pre>
+      </div>
+
+      <p class="section-note">Команда для последующего входа по новому порту:</p>
+      <div class="code-block">
+        <pre><code id="cmd-ssh-new"></code></pre>
         <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
       </div>
     </div>
 
-    <div class="command-wrapper">
-      <label><input type="checkbox"> Создать нового пользователя</label>
+    <!-- Шаг 5 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">5</span> Установка скрипта XRay с репозитория</h2>
+      </div>
+      <p class="section-note">Вариант 1 — Классический транспорт TCP + XTLS-Vision (VLESS + Reality + TCP):</p>
       <div class="code-block">
-        <pre><code>newuser</code></pre>
+        <pre><code>wget -qO- https://raw.githubusercontent.com/ServerTechnologies/simple-xray-core/refs/heads/main/xray-install | bash</code></pre>
         <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <p class="section-note">Вариант 2 — Транспорт XHTTP / SplitHTTP (VLESS + Reality + XHTTP):</p>
+      <div class="code-block">
+        <pre><code>wget -qO- https://raw.githubusercontent.com/ServerTechnologies/simple-xray-core/refs/heads/main/xhttp-xray-install | bash</code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат в конце установки:</div>
+        <pre><code>Xray service started / Active: active (running)</code></pre>
       </div>
     </div>
 
-    <div class="command-wrapper">
-      <label><input type="checkbox"> Удалить пользователя</label>
+    <!-- Шаг 6 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">6</span> Проверка открытых портов на сервере</h2>
+      </div>
+      <p>Убедитесь на самом сервере, что SSH и XRay (порт 443) активны и слушают нужные порты:</p>
       <div class="code-block">
-        <pre><code>rmuser</code></pre>
+        <pre><code id="cmd-ss"></code></pre>
         <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+      </div>
+      <div class="output-preview">
+        <div class="output-preview-title">👁️ Ожидаемый результат:</div>
+        <pre><code id="out-ss">tcp  LISTEN 0  128  0.0.0.0:55969  0.0.0.0:*  users:(("sshd",...))
+tcp  LISTEN 0  511  0.0.0.0:443    0.0.0.0:*  users:(("xray",...))</code></pre>
       </div>
     </div>
 
-    <div class="command-wrapper">
-      <label><input type="checkbox"> Получить ссылку подключения</label>
-      <div class="code-block">
-        <pre><code>sharelink</code></pre>
-        <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+    <!-- Шаг 7 -->
+    <div class="card">
+      <div class="card-header">
+        <h2><span class="step-num">7</span> Команды для управления пользователями</h2>
+      </div>
+
+      <div class="command-wrapper">
+        <label><input type="checkbox" onchange="toggleStep(this)"> Вывести список всех клиентов</label>
+        <div class="code-block">
+          <pre><code>userlist</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+        </div>
+      </div>
+
+      <div class="command-wrapper">
+        <label><input type="checkbox" onchange="toggleStep(this)"> Создать нового пользователя</label>
+        <div class="code-block">
+          <pre><code>newuser</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+        </div>
+      </div>
+
+      <div class="command-wrapper">
+        <label><input type="checkbox" onchange="toggleStep(this)"> Удалить пользователя</label>
+        <div class="code-block">
+          <pre><code>rmuser</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+        </div>
+      </div>
+
+      <div class="command-wrapper">
+        <label><input type="checkbox" onchange="toggleStep(this)"> Получить ссылку подключения</label>
+        <div class="code-block">
+          <pre><code>sharelink</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">Копировать</button>
+        </div>
       </div>
     </div>
 
-    <h2>6. Полезные ссылки</h2>
-    <ul>
-      <li><a href="https://github.com/XTLS/Xray-core" target="_blank">GitHub проекта XRay</a></li>
-      <li><a href="https://xtls.github.io/ru/" target="_blank">Официальная документация на русском</a></li>
-    </ul>
+    <!-- Шаг 8 -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-header">
+        <h2><span class="step-num">8</span> Полезные ссылки</h2>
+      </div>
+      <ul>
+        <li><a href="https://github.com/XTLS/Xray-core" target="_blank" rel="noopener noreferrer">GitHub проекта XRay</a></li>
+        <li><a href="https://xtls.github.io/ru/" target="_blank" rel="noopener noreferrer">Официальная документация на русском</a></li>
+      </ul>
+    </div>
   </div>
 
   <script>
-    // Объявляется функция с именем 'copyCode', которая принимает один аргумент 'button'.
-    // Этот аргумент — это HTML-элемент кнопки, на которую нажал пользователь.
-    function copyCode(button) {
-
-      // Находим элемент, который находится непосредственно перед кнопкой в HTML-структуре.
-      // В данном случае это тег <pre>. Из этого элемента мы получаем его текстовое содержимое (.innerText).
-      // Этот текст (команда) сохраняется в константу 'code'.
-      const code = button.previousElementSibling.innerText;
-
-      // Используем встроенный в браузер API 'Clipboard' для работы с буфером обмена.
-      // Метод 'writeText(code)' пытается асинхронно записать текст из переменной 'code' в буфер обмена.
-      // '.then(...)' — это Promise, который выполнится, если копирование прошло успешно.
-      navigator.clipboard.writeText(code).then(() => {
-
-        // Если копирование успешно, меняем текст на кнопке на "Скопировано!".
-        // Это дает пользователю визуальное подтверждение действия.
-        button.innerText = "Скопировано!";
-
-        // Запускаем таймер. Функция setTimeout выполнит код внутри себя через 1500 миллисекунд (1.5 секунды).
-        // Это нужно, чтобы вернуть текст кнопки в исходное состояние.
-        setTimeout(() => button.innerText = "Копировать", 1500);
-        
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m];
       });
     }
+
+    function updateCommands() {
+      const ip = escapeHtml(document.getElementById('inp-ip').value.trim() || '<IP_сервера>');
+      const user = escapeHtml(document.getElementById('inp-user').value.trim() || 'root');
+      const curPort = escapeHtml(document.getElementById('inp-cur-port').value.trim() || '22');
+      const targetPort = escapeHtml(document.getElementById('inp-target-port').value.trim() || '55969');
+      const iface = escapeHtml(document.getElementById('inp-iface').value.trim() || 'en0');
+
+     document.getElementById('cmd-check').innerHTML =
+        `for p in <span class="dyn-val">${curPort}</span> <span class="dyn-val">${targetPort}</span>; do out=$(nc -vz -b <span class="dyn-val">${iface}</span> -G 2 <span class="dyn-val">${ip}</span> $p 2>&1); if echo "$out" | grep -qi "succeeded"; then echo "🟢 Порт $p: succeeded (прямой канал открыт)"; elif echo "$out" | grep -qi "refused"; then echo "⚪ Порт $p: Connection refused (порт закрыт на сервере)"; else echo "🔴 Порт $p: Operation timed out (пакеты глушатся)"; fi; done`;
+
+      document.getElementById('cmd-check-target').innerHTML =
+        `for p in <span class="dyn-val">${curPort}</span> <span class="dyn-val">${targetPort}</span>; do out=$(ssh-keyscan -T 3 -p $p <span class="dyn-val">${ip}</span> 2>/dev/null | awk '/ssh-/{print $2 " " substr($3,1,8) "...[REDACTED]"; exit}'); [ -n "$out" ] && echo "🟢 Порт $p (SSH): $out" || echo "⚪ Порт $p (SSH): нет ответа (служба не слушает порт)"; done`;
+
+      const setSelectLabels = (selId, portNum, isSsh) => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        if (!isSsh) {
+          sel.options[0].text = `🟢 Порт ${portNum}: succeeded (прямой канал открыт)`;
+          sel.options[1].text = `⚪ Порт ${portNum}: Connection refused (порт закрыт на сервере)`;
+          sel.options[2].text = `🔴 Порт ${portNum}: Operation timed out (пакеты глушатся)`;
+        } else {
+          sel.options[0].text = `🟢 Порт ${portNum} (SSH): ssh-ed25519 / ssh-rsa ...[REDACTED]`;
+          sel.options[1].text = `⚪ Порт ${portNum} (SSH): нет ответа (служба не слушает порт)`;
+        }
+      };
+
+      if (document.getElementById('lbl-c1-cur')) document.getElementById('lbl-c1-cur').innerText = `Порт ${curPort}:`;
+      if (document.getElementById('lbl-c1-target')) document.getElementById('lbl-c1-target').innerText = `Порт ${targetPort}:`;
+      if (document.getElementById('lbl-c2-cur')) document.getElementById('lbl-c2-cur').innerText = `Порт ${curPort} (SSH):`;
+      if (document.getElementById('lbl-c2-target')) document.getElementById('lbl-c2-target').innerText = `Порт ${targetPort} (SSH):`;
+
+      setSelectLabels('sel-c1-cur', curPort, false);
+      setSelectLabels('sel-c1-target', targetPort, false);
+      setSelectLabels('sel-c2-cur', curPort, true);
+      setSelectLabels('sel-c2-target', targetPort, true);
+
+      evaluateDiagnosis();
+
+      if (document.getElementById('matrix-body')) {
+        document.getElementById('matrix-body').innerHTML = `
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🟢 ОТКРЫТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🟢 ОТКРЫТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td>🟢 <strong>Чистый новый сервер:</strong> порт ${curPort} открыт напрямую, порт ${targetPort} ещё не настроен. Входите на порт ${curPort} и переводите на ${targetPort} (Шаг 4).</td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td>🟢 <strong>Сервер уже переведён на ${targetPort}:</strong> порт ${curPort} отключен на сервере, а целевой порт ${targetPort} чист и доступен напрямую без VPN.</td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🔴 ТАЙМАУТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td>🟢 <strong>Сервер настроен (порт ${curPort} под DROP/ТСПУ):</strong> порт ${curPort} не отвечает напрямую, но целевой порт ${targetPort} работает напрямую без фильтрации.</td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🔴 ТАЙМАУТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🟢 ОТКРЫТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td>🟡 <strong>Блокируется только порт ${curPort}:</strong> сам IP чист (порт ${targetPort} вернул честный ⚪ ЗАКРЫТ напрямую). Зайдите через VPN на порт ${curPort} и переведите SSH на ${targetPort}.</td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🔴 ТАЙМАУТ</div><div class="port-line">🔴 ТАЙМАУТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🟢 ОТКРЫТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td>🔴 <strong>ПОЛНАЯ БЛОКИРОВКА IP (кейс fin):</strong> через VPN открыты оба порта, но напрямую через провайдера оба в 🔴 ТАЙМАУТ. <strong>Сервер не подходит — замените IP.</strong></td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">🔴 ТАЙМАУТ</div><div class="port-line">🔴 ТАЙМАУТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">🟢 ОТКРЫТ</div></div></td>
+            <td>🔴 <strong>ПОЛНАЯ БЛОКИРОВКА IP:</strong> порт ${targetPort} уже настроен и работает через VPN, но напрямую блокируется ТСПУ. <strong>Замените IP у хостера.</strong></td>
+          </tr>
+          <tr>
+            <td><div class="port-pair"><div class="port-line">Порт ${curPort}</div><div class="port-line">Порт ${targetPort}</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td><div class="port-pair"><div class="port-line">⚪ ЗАКРЫТ</div><div class="port-line">⚪ ЗАКРЫТ</div></div></td>
+            <td>⚪ <strong>Неверный порт SSH:</strong> блокировки ТСПУ нет (сервер отвечает RST), но SSH слушает другой порт. Проверьте номер порта в письме хостера.</td>
+          </tr>
+        `;
+      }
+
+      document.getElementById('cmd-ssh').innerHTML =
+        curPort === '22'
+          ? `ssh <span class="dyn-val">${user}</span>@<span class="dyn-val">${ip}</span>`
+          : `ssh -p <span class="dyn-val">${curPort}</span> <span class="dyn-val">${user}</span>@<span class="dyn-val">${ip}</span>`;
+
+      document.getElementById('cmd-hardening').innerHTML =
+        `PORT=<span class="dyn-val">${targetPort}</span>; mkdir -p /run/sshd && chmod 0755 /run/sshd; systemctl stop ssh.socket 2>/dev/null || true; systemctl disable ssh.socket 2>/dev/null || true; systemctl enable ssh.service 2>/dev/null || true; command -v ufw >/dev/null && ufw status | grep -qw active && ufw allow \${PORT}/tcp; cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak && (grep -qE '^[#[:space:]]*Port[[:space:]]+' /etc/ssh/sshd_config && sed -i -E "s/^[#[:space:]]*Port[[:space:]]+[0-9]+/Port \${PORT}/" /etc/ssh/sshd_config || echo "Port \${PORT}" >> /etc/ssh/sshd_config) && sshd -t && (systemctl restart ssh || systemctl restart sshd) && echo "SSH переведен на порт \${PORT}"`;
+
+      document.getElementById('cmd-ssh-new').innerHTML =
+        `ssh -p <span class="dyn-val">${targetPort}</span> <span class="dyn-val">${user}</span>@<span class="dyn-val">${ip}</span>`;
+
+      document.getElementById('cmd-ss').innerHTML =
+        `ss -tulpn | grep -E ':(<span class="dyn-val">${curPort}</span>|443|<span class="dyn-val">${targetPort}</span>)\\b'`;
+
+      if (document.getElementById('out-hardening')) {
+        document.getElementById('out-hardening').innerText =
+          `SSH переведен на порт ${targetPort}`;
+      }
+      if (document.getElementById('out-ss')) {
+        document.getElementById('out-ss').innerText =
+          `tcp  LISTEN 0  128  0.0.0.0:${targetPort}  0.0.0.0:*  users:(("sshd",...))\ntcp  LISTEN 0  511  0.0.0.0:443    0.0.0.0:*  users:(("xray",...))`;
+      }
+    }
+
+    function evaluateDiagnosis() {
+      const ip = document.getElementById('inp-ip').value.trim() || '<IP_сервера>';
+      const curPort = document.getElementById('inp-cur-port').value.trim() || '22';
+      const targetPort = document.getElementById('inp-target-port').value.trim() || '55969';
+
+      const c1Cur = document.getElementById('sel-c1-cur') ? document.getElementById('sel-c1-cur').value : 'OPEN';
+      const c1Target = document.getElementById('sel-c1-target') ? document.getElementById('sel-c1-target').value : 'OPEN';
+      const c2Cur = document.getElementById('sel-c2-cur') ? document.getElementById('sel-c2-cur').value : 'CLOSED';
+      const c2Target = document.getElementById('sel-c2-target') ? document.getElementById('sel-c2-target').value : 'OPEN';
+
+      const box = document.getElementById('verdict-container');
+      const title = document.getElementById('verdict-title');
+      const text = document.getElementById('verdict-text');
+      if (!box || !title || !text) return;
+
+      box.className = 'verdict-box';
+
+      if (c2Cur === 'CLOSED' && c2Target === 'CLOSED') {
+        if (c1Cur === 'REFUSED' || c1Target === 'REFUSED') {
+          box.classList.add('verdict-gray');
+          title.innerText = `⚪ Сервер ${ip} в сети (блокировки ТСПУ нет), но оба порта закрыты!`;
+          text.innerText = `Сервер честно отвечает TCP RST (Connection refused), значит провайдер его не блокирует. Но служба SSH не слушает ни порт ${curPort}, ни порт ${targetPort}. Проверьте актуальный порт SSH в панели хостера или в ~/.ssh/config.`;
+        } else {
+          box.classList.add('verdict-gray');
+          title.innerText = `⚪ КРИТИЧЕСКАЯ ОШИБКА: Сервер ${ip} не отвечает ни по одному маршруту!`;
+          text.innerText = `Даже во 2-й команде (через VPN) служба SSH не ответила ни на порту ${curPort}, ни на порту ${targetPort}. Проверьте, включен ли VPN на вашем Mac и запущен ли сам VPS в панели хостинга.`;
+        }
+        return;
+      }
+
+      if (c2Target === 'OPEN' && c1Target !== 'OPEN') {
+        box.classList.add('verdict-red');
+        title.innerText = `🔴 ВЕРДИКТ: IP ${ip} ПОЛНОСТЬЮ ЗАБЛОКИРОВАН ТСПУ / РКН!`;
+        text.innerText = `Целевой высокий порт ${targetPort} уже открыт и отвечает по SSH через VPN, но пакеты напрямую через вашего провайдера блокируются (${c1Target}). Дальнейшая настройка бессмысленна — этот сервер НЕ ПОДХОДИТ для работы из РФ. Запросите замену IP у хостера.`;
+        return;
+      }
+
+      if (c1Target === 'OPEN' && c2Target === 'OPEN') {
+        box.classList.add('verdict-green');
+        if (c2Cur === 'OPEN') {
+          title.innerText = `🟢 ОТЛИЧНО: Прямой канал чист (работают оба порта ${curPort} и ${targetPort})`;
+          text.innerText = `Блокировки ТСПУ нет. Сервер доступен напрямую без VPN, но порт ${curPort} ещё не закрыт. Подключитесь к серверу и завершите перевод только на порт ${targetPort} (Шаг 4).`;
+        } else {
+          title.innerText = `🟢 ПОЛНЫЙ УСПЕХ: Сервер ${ip} настроен и доступен напрямую на порту ${targetPort}!`;
+          text.innerText = `Фильтрация провайдера / ТСПУ отсутствует. Старый порт ${curPort} закрыт, а защищенный порт ${targetPort} открыт напрямую без VPN. Переходите к установке XRay (Шаг 5) или входу по новому порту.`;
+        }
+        return;
+      }
+
+      if (c1Cur === 'OPEN' && c2Cur === 'OPEN' && c2Target === 'CLOSED') {
+        box.classList.add('verdict-green');
+        title.innerText = `🟢 ЧИСТЫЙ НОВЫЙ СЕРВЕР: Порт ${curPort} открыт напрямую без фильтрации ТСПУ`;
+        text.innerText = `Прямой доступ к порту ${curPort} работает штатно, целевой порт ${targetPort} ещё не настроен. Подключайтесь командой №3 ниже, меняйте пароль (Шаг 3) и переводите SSH на порт ${targetPort} (Шаг 4).`;
+        return;
+      }
+
+      if (c1Cur !== 'OPEN' && c2Cur === 'OPEN' && c2Target === 'CLOSED') {
+        if (c1Target === 'REFUSED') {
+          box.classList.add('verdict-yellow');
+          title.innerText = `🟡 ФИЛЬТРАЦИЯ ПОРТА ${curPort}: Сам IP чист, но стандартный порт ${curPort} блокируется`;
+          text.innerText = `Порт ${targetPort} вернул честный Connection refused напрямую — значит IP-адрес НЕ заблокирован ТСПУ, режется только порт ${curPort}. Подключитесь к серверу через активный VPN на порт ${curPort} и переведите SSH на порт ${targetPort} (Шаг 4).`;
+        } else {
+          box.classList.add('verdict-yellow');
+          title.innerText = `🟡 ПОРТ ${curPort} НЕДОСТУПЕН НАПРЯМУЮ: Требуется проверка переводом на порт ${targetPort}`;
+          text.innerText = `Через VPN порт ${curPort} отвечает, но напрямую пакеты не проходят. Подключитесь к серверу с включенным VPN, переведите SSH на высокий порт ${targetPort} (Шаг 4) и повторите проверку Командой 1, чтобы узнать, снимется ли блокировка.`;
+        }
+        return;
+      }
+
+      box.classList.add('verdict-gray');
+      title.innerText = `⚪ Нетипичная комбинация ответов — перепроверьте выбранные статусы`;
+      text.innerText = `Порт показал открытое TCP-соединение напрямую, но демон SSH на нём не ответил во 2-й команде. Убедитесь, что вы скопировали обе команды после ввода правильных портов.`;
+    }
+
+    function copyCode(button) {
+      const code = button.previousElementSibling.innerText;
+
+      const showSuccess = () => {
+        button.innerText = "Скопировано ✓";
+        button.classList.add("copied");
+        setTimeout(() => {
+          button.innerText = "Копировать";
+          button.classList.remove("copied");
+        }, 1500);
+      };
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(showSuccess);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = code;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          document.execCommand("copy");
+          showSuccess();
+        } catch (err) {}
+        document.body.removeChild(textArea);
+      }
+    }
+
+    function toggleStep(checkbox) {
+      const wrapper = checkbox.closest(".command-wrapper");
+      if (wrapper) {
+        wrapper.classList.toggle("completed", checkbox.checked);
+      }
+    }
+
+    // Первичная инициализация при открытии страницы
+    updateCommands();
   </script>
 
 </body>
